@@ -12,7 +12,7 @@ const Events: Event[] = events;
 
 export const Home = () => {
   const [startingData, setStartingData] = useState(Events);
-  const [sort, setSort] = useState<keyof Event>("receiver");
+  const [sort, setSort] = useState<keyof Event>("id");
   const [sortedData, setSortedData] = useState(startingData);
   const [partitions, setPartitions] = useState<Event[][]>([]);
   const [partitionMetaData, setPartitionMetaData] = useState<
