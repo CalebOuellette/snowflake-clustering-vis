@@ -9,8 +9,8 @@ export const EventKeys: (keyof Event)[] = [
   "id",
   "sender",
   "receiver",
-  "sender",
   "external_id",
+  "amount",
 ];
 
 export type EventPartitionMetaData = {

@@ -65,6 +65,7 @@ const PartitionGroup = styled.div`
 
 const Flex = styled.div`
   display: flex;
+  overflow-y: scroll;
 `;
 
 const ValueCell = styled.td`

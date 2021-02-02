@@ -4,26 +4,11 @@ import { MicroPartitions } from "./MicroPartitions";
 import { QuestionsClusterDepth } from "./QuestionsClusterDepth";
 import { Event, EventKeys, EventPartitionMetaData } from "../../Types";
 import { splitToChunks, findMax } from "../../utils";
+import events from "../../data/t.json";
+import styled from "styled-components";
+const PARTITION_COUNT = 7;
 
-const PARTITION_COUNT = 4;
-
-const Events: Event[] = [
-  { id: 1, sender: "caleb", receiver: "bob", amount: 90, external_id: "a" },
-  { id: 2, sender: "chris", receiver: "bob", amount: 90, external_id: "b" },
-  { id: 3, sender: "caleb", receiver: "michael", amount: 90, external_id: "c" },
-  { id: 4, sender: "michael", receiver: "bob", amount: 90, external_id: "d" },
-  { id: 5, sender: "caleb", receiver: "bob", amount: 90, external_id: "e" },
-  { id: 6, sender: "suet", receiver: "bob", amount: 90, external_id: "e" },
-  { id: 7, sender: "caleb", receiver: "bob", amount: 90, external_id: "f" },
-  { id: 8, sender: "caleb", receiver: "cathy", amount: 90, external_id: "g" },
-  { id: 9, sender: "caleb", receiver: "bob", amount: 90, external_id: "h" },
-  { id: 10, sender: "caleb", receiver: "bob", amount: 90, external_id: "i" },
-  { id: 11, sender: "caleb", receiver: "bob", amount: 90, external_id: "j" },
-  { id: 12, sender: "caleb", receiver: "bob", amount: 90, external_id: "k" },
-  { id: 13, sender: "caleb", receiver: "bob", amount: 90, external_id: "l" },
-  { id: 14, sender: "caleb", receiver: "bob", amount: 90, external_id: "m" },
-  { id: 15, sender: "caleb", receiver: "bob", amount: 90, external_id: "n" },
-];
+const Events: Event[] = events;
 
 export const Home = () => {
   const [startingData, setStartingData] = useState(Events);
@@ -35,12 +20,13 @@ export const Home = () => {
   >([]);
 
   useEffect(() => {
-    setSortedData(startingData.sort((a, b) => (a[sort] > b[sort] ? 1 : -1)));
+    const newData = startingData.sort((a, b) => (a[sort] > b[sort] ? 1 : -1));
+    setSortedData([...newData]);
   }, [sort, startingData]);
 
   useEffect(() => {
     const partitions = splitToChunks(sortedData, PARTITION_COUNT);
-    setPartitions(partitions);
+    setPartitions([...partitions]);
   }, [sortedData]);
 
   useEffect(() => {
@@ -65,9 +51,46 @@ export const Home = () => {
   return (
     <div>
       <h1>Snowflake Clustering Visualization</h1>
+      <HandleSort sort={sort} setSort={setSort} />
       <EventTable events={sortedData} />
       <MicroPartitions metaData={partitionMetaData} partitions={partitions} />
       <QuestionsClusterDepth metaData={partitionMetaData} />
     </div>
   );
 };
+
+const sortOptions = ["id", "external_id", "receiver", "sender"];
+
+const HandleSort = ({
+  sort,
+  setSort,
+}: {
+  sort: string;
+  setSort: (s: keyof Event) => void;
+}) => {
+  return (
+    <SortBox>
+      <form>
+        {sortOptions.map((o) => (
+          <div key={o} className="radio">
+            <label>
+              <input
+                type="radio"
+                value={o}
+                checked={sort === o}
+                onChange={(e) => {
+                  setSort((e.target.value as unknown) as keyof Event);
+                }}
+              />
+              {o}
+            </label>
+          </div>
+        ))}
+      </form>
+    </SortBox>
+  );
+};
+
+const SortBox = styled.div`
+  margin: 30px;
+`;
